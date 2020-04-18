@@ -1,11 +1,19 @@
 use std::env;
 use std::fs;
 use std::io::{self, Write};
+use std::marker::PhantomData;
 
 pub mod token;
+use token::*;
 
 pub mod scanner;
 use scanner::Scanner;
+
+pub mod expr;
+use expr::*;
+
+pub mod ast_printer;
+use ast_printer::*;
 
 pub struct RustyLocks {
     had_error: bool
@@ -61,6 +69,32 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let mut rl = RustyLocks::new();
+
+    let literal_expr = LiteralExpr {
+        value: LiteralValue::Number(123_f32),
+        _phantom: PhantomData
+    };
+
+    let unary_expression = UnaryExpr {
+        operator: Token::new(TokenType::Minus, String::from("-"), LiteralValue::Null, 1),
+        right: &literal_expr,
+        _phantom: PhantomData
+    };
+
+    let grouping_expression = GroupingExpr {
+       expression: &LiteralExpr { value: LiteralValue::Number(45.67_f32), _phantom: PhantomData },
+       _phantom: PhantomData 
+    };
+
+    let binary_expression = BinaryExpr {
+        left: &unary_expression,
+        operator: Token::new(TokenType::Star, String::from("*"), LiteralValue::Null, 1),
+        right: &grouping_expression,
+        _phantom: PhantomData
+    };
+
+    let mut printer = AstPrinter::new();
+    println!("{}", printer.print(&binary_expression));
 
     match args.len() {
         1 => { rl.run_prompt(); },

@@ -1,4 +1,4 @@
-use crate::token::{Token, TokenType, Literal};
+use crate::token::{Token, TokenType, LiteralValue};
 use crate::RustyLocks;
 use std::collections::HashMap;
 
@@ -50,7 +50,7 @@ impl<'a> Scanner<'a> {
             self.scan_token();
         }
 
-        self.tokens.push(Token::new(TokenType::EOF, String::from(""), Literal::Null, self.line));
+        self.tokens.push(Token::new(TokenType::EOF, String::from(""), LiteralValue::Null, self.line));
 
         &self.tokens
     }
@@ -157,7 +157,7 @@ impl<'a> Scanner<'a> {
 
         let value = self.substr(1, 1);
 
-        self.add_token(TokenType::String, Some(Literal::String(value)));
+        self.add_token(TokenType::String, Some(LiteralValue::String(value)));
     }
 
     fn number(&mut self) {
@@ -173,7 +173,7 @@ impl<'a> Scanner<'a> {
             }
         }
 
-        self.add_token(TokenType::Number, Some(Literal::Number(self.substr(0, 0).parse::<f32>().expect("failed to parse f32 in number"))));
+        self.add_token(TokenType::Number, Some(LiteralValue::Number(self.substr(0, 0).parse::<f32>().expect("failed to parse f32 in number"))));
     }
 
     fn identifier(&mut self) {
@@ -238,11 +238,11 @@ impl<'a> Scanner<'a> {
         self.source.chars().skip((self.start + offset_start) as usize).take((self.current - (self.start + offset_start) - offset_end) as usize).collect()
     }
 
-    fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
+    fn add_token(&mut self, token_type: TokenType, literal: Option<LiteralValue>) {
         let text: String = self.source.chars().skip(self.start as usize).take((self.current - self.start) as usize).collect();
         let literal_value = match literal {
             Some(v) => v,
-            _ => Literal::Null
+            _ => LiteralValue::Null
         };
 
         self.tokens.push(Token::new(token_type, text, literal_value, self.line));

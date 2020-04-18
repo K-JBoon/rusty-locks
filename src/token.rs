@@ -52,27 +52,27 @@ impl std::fmt::Display for TokenType {
 }
 
 #[derive(Debug)]
-pub enum Literal {
+pub enum LiteralValue {
     String(String),
     Number(f32),
     Null
 }
 
-impl std::fmt::Display for Literal {
+impl std::fmt::Display for LiteralValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
 
 pub struct Token {
-    token_type: TokenType,
-    lexeme: String,
-    literal: Literal,
-    line: i32
+    pub token_type: TokenType,
+    pub lexeme: String,
+    pub literal: LiteralValue,
+    pub line: i32
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, lexeme: String, literal: Literal, line: i32) -> Token {
+    pub fn new(token_type: TokenType, lexeme: String, literal: LiteralValue, line: i32) -> Token {
         Token {
             token_type: token_type,
             lexeme: lexeme,
